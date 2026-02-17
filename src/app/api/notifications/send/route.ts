@@ -6,54 +6,60 @@ import { supabase } from '@/lib/supabase';
 function getFirebaseAdmin(): any {
     if (admin.apps.length > 0) return admin;
 
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    // 1. Try dedicated variables (Vercel best practice)
+    if (projectId && clientEmail && privateKey) {
+        try {
+            admin.initializeApp({
+                credential: admin.credential.cert({
+                    projectId,
+                    clientEmail,
+                    privateKey: privateKey.replace(/\\n/g, '\n'),
+                }),
+            });
+            return admin;
+        } catch (e: any) {
+            console.error('Firebase Init Error (Dedicated):', e);
+            // Don't return yet, try JSON fallback
+        }
+    }
+
+    // 2. Fallback to JSON if dedicated variables are missing
     let serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (serviceAccount) {
+        try {
+            let cleanedAccount = serviceAccount.trim();
+            if (cleanedAccount.startsWith("'") && cleanedAccount.endsWith("'")) {
+                cleanedAccount = cleanedAccount.slice(1, -1);
+            }
+            const parsedAccount = JSON.parse(cleanedAccount);
 
-    if (!serviceAccount || serviceAccount.length === 0) {
-        return { error: 'FIREBASE_SERVICE_ACCOUNT is missing in environment variables.' };
+            // Apply the same cleaning to the fallback JSON key
+            if (parsedAccount.private_key) {
+                let rawKey = parsedAccount.private_key.replace(/\\n/g, '\n');
+                const startMarker = '-----BEGIN PRIVATE KEY-----';
+                const endMarker = '-----END PRIVATE KEY-----';
+                let base64Part = rawKey;
+                if (rawKey.includes(startMarker)) base64Part = rawKey.split(startMarker)[1];
+                if (base64Part.includes(endMarker)) base64Part = base64Part.split(endMarker)[0];
+                const cleanBase64 = base64Part.replace(/\s/g, '').replace(/["',]/g, '').trim();
+                parsedAccount.private_key = `${startMarker}\n${cleanBase64}\n${endMarker}\n`;
+            }
+
+            admin.initializeApp({
+                credential: admin.credential.cert(parsedAccount),
+            });
+            return admin;
+        } catch (e: any) {
+            console.error('Firebase Init Error (JSON):', e);
+            return { error: `Firebase Init Failed: ${e.message}` };
+        }
     }
 
-    try {
-        // Clean potential whitespace and quotes
-        let cleanedAccount = serviceAccount.trim();
-        if (cleanedAccount.startsWith("'") && cleanedAccount.endsWith("'")) {
-            cleanedAccount = cleanedAccount.slice(1, -1);
-        } else if (cleanedAccount.startsWith('"') && cleanedAccount.endsWith('"')) {
-            cleanedAccount = cleanedAccount.slice(1, -1);
-        }
-
-        const parsedAccount = JSON.parse(cleanedAccount);
-
-        // Fallback or override from dedicated variable if provided
-        if (process.env.FIREBASE_PRIVATE_KEY) {
-            parsedAccount.private_key = process.env.FIREBASE_PRIVATE_KEY;
-        }
-
-        // 3. Ultimate PEM Sanitizer
-        // This handles double-escaping, trailing junk (ASN.1 DER error), and incorrect newlines.
-        if (parsedAccount.private_key) {
-            let rawKey = parsedAccount.private_key.replace(/\\n/g, '\n');
-            const startMarker = '-----BEGIN PRIVATE KEY-----';
-            const endMarker = '-----END PRIVATE KEY-----';
-
-            let base64Part = rawKey;
-            if (rawKey.includes(startMarker)) base64Part = rawKey.split(startMarker)[1];
-            if (base64Part.includes(endMarker)) base64Part = base64Part.split(endMarker)[0];
-
-            // Clean base64: remove whitespace, newlines, quotes, and commas
-            const cleanBase64 = base64Part.replace(/\s/g, '').replace(/["',]/g, '').trim();
-
-            // Reconstruct perfectly
-            parsedAccount.private_key = `${startMarker}\n${cleanBase64}\n${endMarker}\n`;
-        }
-
-        admin.initializeApp({
-            credential: admin.credential.cert(parsedAccount),
-        });
-        return admin;
-    } catch (parseError: any) {
-        console.error('Error parsing FIREBASE_SERVICE_ACCOUNT:', parseError);
-        return { error: `JSON Parse Error: ${parseError.message}` };
-    }
+    return { error: 'Firebase Admin not configured. Provide FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY.' };
 }
 
 export async function POST(req: Request) {
