@@ -22,6 +22,12 @@ function getFirebaseAdmin(): any {
         }
 
         const parsedAccount = JSON.parse(cleanedAccount);
+
+        // Robustness: ensure common escaping issues with private_key (like literal \n) are fixed
+        if (parsedAccount.private_key) {
+            parsedAccount.private_key = parsedAccount.private_key.replace(/\\n/g, '\n');
+        }
+
         admin.initializeApp({
             credential: admin.credential.cert(parsedAccount),
         });
