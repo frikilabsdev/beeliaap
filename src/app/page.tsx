@@ -114,7 +114,7 @@ export default async function Home() {
                 <GalleryGrid images={gallery} />
 
                 {/* Footer */}
-                <footer className="mt-auto px-8 pb-12 pt-16 flex flex-col items-center translate-y-2">
+                <footer className="mt-auto px-8 pb-12 pt-16 flex flex-col items-center">
                     <div className="w-12 h-[1px] bg-brand-gold/20 mb-8" />
 
                     <div className="flex flex-col items-center space-y-3 md:block text-[10px] text-brand-obsidian/60 tracking-[0.25em] uppercase font-bold text-center leading-relaxed">
