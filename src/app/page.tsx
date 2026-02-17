@@ -114,7 +114,7 @@ export default async function Home() {
                 <GalleryGrid images={gallery} />
 
                 {/* Footer */}
-                <footer className="mt-auto px-8 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-12 text-[10px] text-brand-obsidian/40 tracking-[0.2em] uppercase font-bold text-center leading-relaxed">
+                <footer className="mt-auto px-8 pb-[calc(110px+env(safe-area-inset-bottom))] pt-12 text-[10px] text-brand-obsidian/50 tracking-[0.2em] uppercase font-bold text-center leading-relaxed">
                     <div className="flex flex-col items-center space-y-2 md:block">
                         <span>© 2026 BEELIA SHOP - HECHO CON ❤️ POR </span>
                         <a
