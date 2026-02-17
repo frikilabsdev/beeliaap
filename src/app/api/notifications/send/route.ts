@@ -83,14 +83,34 @@ export async function POST(req: Request) {
         }
         const firebase = firebaseResult;
 
-        // 3. Construct Message
-        const message = {
+        // 3. Construct Message with High Priority for delivery
+        const message: any = {
             notification: {
                 title,
                 body,
             },
             data: {
                 url: url || '/',
+            },
+            android: {
+                priority: 'high',
+                notification: {
+                    sound: 'default',
+                    clickAction: url || '/',
+                }
+            },
+            apns: {
+                payload: {
+                    aps: {
+                        sound: 'default',
+                        'content-available': 1
+                    }
+                }
+            },
+            webpush: {
+                fcmOptions: {
+                    link: url || '/'
+                }
             },
             tokens,
         };
