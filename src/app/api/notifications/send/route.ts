@@ -28,18 +28,22 @@ function getFirebaseAdmin(): any {
             parsedAccount.private_key = process.env.FIREBASE_PRIVATE_KEY;
         }
 
-        // Robustness: ensure common escaping issues with private_key (like literal \n) are fixed
+        // 3. Ultimate PEM Sanitizer
+        // This handles double-escaping, trailing junk (ASN.1 DER error), and incorrect newlines.
         if (parsedAccount.private_key) {
-            let key = parsedAccount.private_key.replace(/\\n/g, '\n');
+            let rawKey = parsedAccount.private_key.replace(/\\n/g, '\n');
             const startMarker = '-----BEGIN PRIVATE KEY-----';
             const endMarker = '-----END PRIVATE KEY-----';
-            const startIdx = key.indexOf(startMarker);
-            const endIdx = key.indexOf(endMarker);
 
-            if (startIdx !== -1 && endIdx !== -1) {
-                key = key.substring(startIdx, endIdx + endMarker.length);
-            }
-            parsedAccount.private_key = key.trim();
+            let base64Part = rawKey;
+            if (rawKey.includes(startMarker)) base64Part = rawKey.split(startMarker)[1];
+            if (base64Part.includes(endMarker)) base64Part = base64Part.split(endMarker)[0];
+
+            // Clean base64: remove whitespace, newlines, quotes, and commas
+            const cleanBase64 = base64Part.replace(/\s/g, '').replace(/["',]/g, '').trim();
+
+            // Reconstruct perfectly
+            parsedAccount.private_key = `${startMarker}\n${cleanBase64}\n${endMarker}\n`;
         }
 
         admin.initializeApp({
