@@ -1,4 +1,4 @@
-import { Play, Download } from "lucide-react";
+import { Play, Download, Heart } from "lucide-react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import LinkItem from "@/components/LinkItem";
@@ -114,14 +114,22 @@ export default async function Home() {
                 <GalleryGrid images={gallery} />
 
                 {/* Footer */}
-                <footer className="mt-auto px-8 pb-[calc(110px+env(safe-area-inset-bottom))] pt-12 text-[10px] text-brand-obsidian/50 tracking-[0.2em] uppercase font-bold text-center leading-relaxed">
-                    <div className="flex flex-col items-center space-y-2 md:block">
-                        <span>© 2026 BEELIA SHOP - HECHO CON ❤️ POR </span>
+                <footer className="mt-auto px-8 pb-[calc(110px+env(safe-area-inset-bottom))] pt-16 flex flex-col items-center">
+                    <div className="w-12 h-[1px] bg-brand-gold/20 mb-8" />
+
+                    <div className="flex flex-col items-center space-y-3 md:block text-[10px] text-brand-obsidian/60 tracking-[0.25em] uppercase font-bold text-center leading-relaxed">
+                        <div className="flex items-center justify-center space-x-2 mb-1">
+                            <span>© 2026 BEELIA SHOP</span>
+                            <span className="w-1 h-1 rounded-full bg-brand-gold/40" />
+                            <span className="flex items-center">
+                                HECHO CON <Heart className="w-3 h-3 mx-1.5 fill-brand-gold text-brand-gold animate-pulse" /> POR
+                            </span>
+                        </div>
                         <a
                             href="https://frikilabs.click"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-brand-gold hover:text-brand-gold/80 transition-colors underline decoration-brand-gold/20"
+                            className="text-brand-gold hover:text-brand-gold/80 transition-colors underline decoration-brand-gold/30 underline-offset-4"
                         >
                             FRIKILABS.CLICK
                         </a>

@@ -21,12 +21,12 @@ export default function LinkItem({ id, label, url }: LinkItemProps) {
             onClick={handleClick}
             target="_blank"
             rel="noopener noreferrer"
-            className="group block w-full bg-white hover:bg-brand-pearl/50 border border-brand-gold/20 hover:border-brand-gold/40 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg active:scale-95"
+            className="group flex items-center w-full bg-white hover:bg-brand-pearl/50 border border-brand-gold/20 hover:border-brand-gold/40 rounded-2xl p-4 transition-all duration-300 hover:shadow-lg active:scale-95"
         >
-            <div className="mr-4 transition-transform group-hover:scale-110">
-                <Play className="w-3 h-3 fill-brand-obsidian text-brand-obsidian" />
+            <div className="flex-shrink-0 mr-4 transition-transform group-hover:scale-110">
+                <Play className="w-2.5 h-2.5 fill-brand-gold text-brand-gold" />
             </div>
-            <span className="text-[13px] tracking-[0.2em] font-bold text-brand-obsidian/80 uppercase">
+            <span className="text-[12px] tracking-[0.2em] font-bold text-brand-obsidian/80 uppercase">
                 {label}
             </span>
         </a>
