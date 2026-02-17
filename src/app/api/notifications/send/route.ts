@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 function getFirebaseAdmin() {
     if (admin.apps.length > 0) return admin;
 
-    const serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
+    let serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
 
     if (!serviceAccount) {
         console.warn('FIREBASE_SERVICE_ACCOUNT not found in environment variables.');
@@ -14,6 +14,11 @@ function getFirebaseAdmin() {
     }
 
     try {
+        // Clean the string if it was wrapped in single quotes in .env
+        if (serviceAccount.startsWith("'") && serviceAccount.endsWith("'")) {
+            serviceAccount = serviceAccount.slice(1, -1);
+        }
+
         const parsedAccount = JSON.parse(serviceAccount);
         admin.initializeApp({
             credential: admin.credential.cert(parsedAccount),
