@@ -12,13 +12,17 @@ export function PushSubscription() {
 
     const [shouldVibrate, setShouldVibrate] = useState(false);
     const [isIOS, setIsIOS] = useState(false);
+    const [isChrome, setIsChrome] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
     const [showInstructions, setShowInstructions] = useState(false);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
-            const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+            const ua = navigator.userAgent;
+            const ios = /iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream;
+            const isChrome = /CriOS/i.test(ua);
             setIsIOS(ios);
+            setIsChrome(isChrome);
             setIsStandalone(window.matchMedia('(display-mode: standalone)').matches || (navigator as any).standalone);
 
             if ("Notification" in window) {
@@ -85,7 +89,8 @@ export function PushSubscription() {
         }
     };
 
-    if (permission === "denied") return null;
+    // We no longer return null if denied, instead we show a "blocked" state to help user unblock
+    // if (permission === "denied") return null;
 
     return (
         <>
@@ -145,7 +150,7 @@ export function PushSubscription() {
                                         <Share2 className="w-4 h-4 text-brand-gold" />
                                     </div>
                                     <div className="text-xs text-brand-obsidian/80">
-                                        Pulsa el botón de <strong>Compartir</strong> en la barra inferior de Safari.
+                                        Pulsa el botón de <strong>Compartir</strong> {isChrome ? "(en la barra superior)" : "(en la barra inferior)"}.
                                     </div>
                                 </div>
 
