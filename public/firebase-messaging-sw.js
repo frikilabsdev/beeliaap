@@ -20,7 +20,7 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: '/img/logo.png', // Icon if available
+    icon: '/icono.png', // Updated path
     data: {
       url: payload.data ? payload.data.url : '/'
     }
