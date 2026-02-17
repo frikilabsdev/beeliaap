@@ -25,7 +25,7 @@ function getFirebaseAdmin(): any {
 
         // Robustness: ensure common escaping issues with private_key (like literal \n) are fixed
         if (parsedAccount.private_key) {
-            parsedAccount.private_key = parsedAccount.private_key.replace(/\\n/g, '\n');
+            parsedAccount.private_key = parsedAccount.private_key.replace(/\\n/g, '\n').trim();
         }
 
         admin.initializeApp({
