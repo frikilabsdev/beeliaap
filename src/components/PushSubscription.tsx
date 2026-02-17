@@ -97,7 +97,7 @@ export function PushSubscription() {
             <button
                 onClick={handleSubscribe}
                 disabled={loading || isSubscribed}
-                className={`flex-1 flex items-center justify-center space-x-3 px-6 py-5 rounded-2xl border transition-all duration-300 shadow-lg active:scale-95 ${isSubscribed
+                className={`flex-1 flex items-center justify-center space-x-3 px-6 py-5 rounded-2xl border transition-all duration-300 shadow-lg active:scale-95 ${isSubscribed || permission === "denied"
                     ? "bg-brand-pearl/20 border-brand-gold/10 text-brand-obsidian/40 cursor-default"
                     : "bg-white border-brand-gold/20 text-brand-obsidian hover:shadow-xl hover:scale-[1.02]"
                     }`}
@@ -106,7 +106,9 @@ export function PushSubscription() {
                     <Loader2 className="w-5 h-5 animate-spin text-brand-gold" />
                 ) : (
                     <div className={`${shouldVibrate ? "animate-vibrate" : ""}`}>
-                        {isSubscribed ? (
+                        {permission === "denied" ? (
+                            <Bell className="w-5 h-5 opacity-20" />
+                        ) : isSubscribed ? (
                             <BellRing className="w-5 h-5 text-brand-gold" />
                         ) : (
                             <Bell className="w-5 h-5 text-brand-gold/60" />
@@ -114,7 +116,7 @@ export function PushSubscription() {
                     </div>
                 )}
                 <span className="text-[11px] tracking-[0.2em] font-bold uppercase whitespace-nowrap">
-                    {isSubscribed ? "SUSCRITO" : "ALERTAS"}
+                    {permission === "denied" ? "BLOQUEADO" : isSubscribed ? "SUSCRITO" : "ALERTAS"}
                 </span>
             </button>
 
