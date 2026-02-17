@@ -115,15 +115,17 @@ export default async function Home() {
 
                 {/* Footer */}
                 <footer className="mt-auto px-8 pb-[calc(3rem+env(safe-area-inset-bottom))] pt-12 text-[10px] text-brand-obsidian/40 tracking-[0.2em] uppercase font-bold text-center leading-relaxed">
-                    © 2026 BEELIA SHOP - HECHO CON ❤️ POR{" "}
-                    <a
-                        href="https://frikilabs.click"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-brand-gold hover:text-brand-gold/80 transition-colors underline decoration-brand-gold/20"
-                    >
-                        FRIKILABS.CLICK
-                    </a>
+                    <div className="flex flex-col items-center space-y-2 md:block">
+                        <span>© 2026 BEELIA SHOP - HECHO CON ❤️ POR </span>
+                        <a
+                            href="https://frikilabs.click"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-brand-gold hover:text-brand-gold/80 transition-colors underline decoration-brand-gold/20"
+                        >
+                            FRIKILABS.CLICK
+                        </a>
+                    </div>
                 </footer>
             </div>
         </main>
