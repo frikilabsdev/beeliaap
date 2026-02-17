@@ -23,9 +23,23 @@ function getFirebaseAdmin(): any {
 
         const parsedAccount = JSON.parse(cleanedAccount);
 
+        // Fallback or override from dedicated variable if provided
+        if (process.env.FIREBASE_PRIVATE_KEY) {
+            parsedAccount.private_key = process.env.FIREBASE_PRIVATE_KEY;
+        }
+
         // Robustness: ensure common escaping issues with private_key (like literal \n) are fixed
         if (parsedAccount.private_key) {
-            parsedAccount.private_key = parsedAccount.private_key.replace(/\\n/g, '\n').trim();
+            let key = parsedAccount.private_key.replace(/\\n/g, '\n');
+            const startMarker = '-----BEGIN PRIVATE KEY-----';
+            const endMarker = '-----END PRIVATE KEY-----';
+            const startIdx = key.indexOf(startMarker);
+            const endIdx = key.indexOf(endMarker);
+
+            if (startIdx !== -1 && endIdx !== -1) {
+                key = key.substring(startIdx, endIdx + endMarker.length);
+            }
+            parsedAccount.private_key = key.trim();
         }
 
         admin.initializeApp({
