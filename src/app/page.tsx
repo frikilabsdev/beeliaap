@@ -39,7 +39,7 @@ export default async function Home() {
             <div className="w-full max-w-[600px] flex flex-col items-center bg-white min-h-[100dvh] shadow-[0_0_50px_rgba(0,0,0,0.02)]">
 
                 {/* Header Banner */}
-                <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden sm:rounded-b-[2.5rem] lg:rounded-t-[2.5rem] lg:mt-6 transition-all duration-700 ease-out shadow-sm pt-[env(safe-area-inset-top)] bg-brand-gold/10">
+                <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden sm:rounded-b-[2.5rem] lg:rounded-t-[2.5rem] lg:mt-6 transition-all duration-700 ease-out shadow-sm bg-brand-gold/10">
                     <Image
                         src={config.header_image_url || "/img/header.png"}
                         alt="Beelia Floral Header"
@@ -114,7 +114,7 @@ export default async function Home() {
                 <GalleryGrid images={gallery} />
 
                 {/* Footer */}
-                <footer className="mt-auto px-8 pb-[calc(2.5rem+env(safe-area-inset-bottom))] pt-16 flex flex-col items-center">
+                <footer className="mt-auto px-8 pb-12 pt-16 flex flex-col items-center translate-y-2">
                     <div className="w-12 h-[1px] bg-brand-gold/20 mb-8" />
 
                     <div className="flex flex-col items-center space-y-3 md:block text-[10px] text-brand-obsidian/60 tracking-[0.25em] uppercase font-bold text-center leading-relaxed">
