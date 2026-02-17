@@ -42,13 +42,14 @@ export async function POST(req: Request) {
         }
 
         // 2. Initialize Firebase Admin
-        const firebase = getFirebaseAdmin();
-        if (!firebase) {
+        const firebaseResult = getFirebaseAdmin();
+        if ('error' in firebaseResult) {
             return NextResponse.json({
                 success: false,
-                error: 'Firebase Admin not configured. Please add FIREBASE_SERVICE_ACCOUNT to .env'
+                error: firebaseResult.error
             }, { status: 500 });
         }
+        const firebase = firebaseResult;
 
         // 3. Construct Message
         const message = {
