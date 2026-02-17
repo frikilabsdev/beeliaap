@@ -73,7 +73,7 @@ export async function POST(req: Request) {
         // 5. Cleanup failed tokens if needed
         if (response.failureCount > 0) {
             const failedTokens: string[] = [];
-            response.responses.forEach((resp, idx) => {
+            response.responses.forEach((resp: any, idx: number) => {
                 if (!resp.success) {
                     failedTokens.push(tokens[idx]);
                     console.error(`Token ${tokens[idx]} failed:`, resp.error);
