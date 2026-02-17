@@ -76,13 +76,11 @@
   * {
     @apply border-border;
     -webkit-tap-highlight-color: transparent;
-    touch-action: manipulation;
-    user-select: none;
   }
 
   html,
   body {
-    overscroll-behavior: none;
+    @apply bg-background text-foreground antialiased;
   }
 
   body {

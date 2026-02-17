@@ -34,7 +34,7 @@ export default async function Home() {
     const gallery = galleryResponse.data || [];
 
     return (
-        <main className="min-h-[100dvh] bg-white flex flex-col items-center overflow-x-hidden">
+        <main className="w-full bg-white flex flex-col items-center">
             {/* Centered container for Desktop harmony */}
             <div className="w-full max-w-[600px] flex flex-col items-center bg-white min-h-[100dvh] shadow-[0_0_50px_rgba(0,0,0,0.02)]">
 
@@ -129,7 +129,7 @@ export default async function Home() {
                             href="https://frikilabs.click"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-brand-gold hover:text-brand-gold/80 transition-colors underline decoration-brand-gold/30 underline-offset-4"
+                            className="text-[11px] text-brand-gold hover:text-brand-gold/80 transition-colors underline decoration-brand-gold/40 underline-offset-4 font-black"
                         >
                             FRIKILABS.CLICK
                         </a>
