@@ -21,9 +21,13 @@ export const requestForToken = async () => {
     if (!messaging) return null;
 
     try {
-        const currentToken = await getToken(messaging, {
-            vapidKey: "BILgL6MYKFmw_2Giz3DEEkOkIHq6xa6YW9Xxpgx-0xNc3Vc2Smjmv9bY7k7UcqXWWmnnly3WXy8BKxOAVnClqHE"
-        });
+        const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
+        if (!vapidKey) {
+            console.error('VAPID Key is missing in environment variables.');
+            return null;
+        }
+
+        const currentToken = await getToken(messaging, { vapidKey });
         if (currentToken) {
             console.log('Token received:', currentToken);
             return currentToken;
