@@ -3,30 +3,32 @@ import admin from 'firebase-admin';
 import { supabase } from '@/lib/supabase';
 
 // Helper to initialize Firebase Admin once
-function getFirebaseAdmin() {
+function getFirebaseAdmin(): any {
     if (admin.apps.length > 0) return admin;
 
     let serviceAccount = process.env.FIREBASE_SERVICE_ACCOUNT;
 
-    if (!serviceAccount) {
-        console.warn('FIREBASE_SERVICE_ACCOUNT not found in environment variables.');
-        return null;
+    if (!serviceAccount || serviceAccount.length === 0) {
+        return { error: 'FIREBASE_SERVICE_ACCOUNT is missing in environment variables.' };
     }
 
     try {
-        // Clean the string if it was wrapped in single quotes in .env
-        if (serviceAccount.startsWith("'") && serviceAccount.endsWith("'")) {
-            serviceAccount = serviceAccount.slice(1, -1);
+        // Clean potential whitespace and quotes
+        let cleanedAccount = serviceAccount.trim();
+        if (cleanedAccount.startsWith("'") && cleanedAccount.endsWith("'")) {
+            cleanedAccount = cleanedAccount.slice(1, -1);
+        } else if (cleanedAccount.startsWith('"') && cleanedAccount.endsWith('"')) {
+            cleanedAccount = cleanedAccount.slice(1, -1);
         }
 
-        const parsedAccount = JSON.parse(serviceAccount);
+        const parsedAccount = JSON.parse(cleanedAccount);
         admin.initializeApp({
             credential: admin.credential.cert(parsedAccount),
         });
         return admin;
-    } catch (error) {
-        console.error('Error parsing FIREBASE_SERVICE_ACCOUNT:', error);
-        return null;
+    } catch (parseError: any) {
+        console.error('Error parsing FIREBASE_SERVICE_ACCOUNT:', parseError);
+        return { error: `JSON Parse Error: ${parseError.message}` };
     }
 }
 
