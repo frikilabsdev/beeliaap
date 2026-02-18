@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import { getMessaging, getToken, isSupported, onMessage } from "firebase/messaging";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -14,13 +14,26 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Initialize Messaging
-export const messaging = typeof window !== "undefined" ? getMessaging(app) : null;
+let messagingInstance: ReturnType<typeof getMessaging> | null = null;
+
+async function getMessagingInstance() {
+    if (typeof window === "undefined") return null;
+    const supported = await isSupported();
+    if (!supported) {
+        console.warn("Firebase Messaging is not supported in this browser/environment.");
+        return null;
+    }
+    if (!messagingInstance) {
+        messagingInstance = getMessaging(app);
+    }
+    return messagingInstance;
+}
 
 export const requestForToken = async () => {
-    if (!messaging) return null;
-
     try {
+        const messaging = await getMessagingInstance();
+        if (!messaging) return null;
+
         const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
         if (!vapidKey) {
             console.error('VAPID Key is missing in environment variables.');
@@ -30,7 +43,8 @@ export const requestForToken = async () => {
         // Explicitly register service worker for better reliability in PWA mode
         let currentToken = null;
         if ('serviceWorker' in navigator) {
-            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/' });
+            await navigator.serviceWorker.ready;
             console.log('SW Registered explicitly:', registration.scope);
             currentToken = await getToken(messaging, {
                 vapidKey,
@@ -56,8 +70,12 @@ export const requestForToken = async () => {
 
 export const onMessageListener = () =>
     new Promise((resolve) => {
-        if (!messaging) return;
-        onMessage(messaging, (payload: any) => {
-            resolve(payload);
+        getMessagingInstance().then((messaging) => {
+            if (!messaging) return;
+            onMessage(messaging, (payload: any) => {
+                resolve(payload);
+            });
+        }).catch((error) => {
+            console.error("Error initializing onMessage listener:", error);
         });
     });

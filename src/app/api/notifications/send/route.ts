@@ -108,6 +108,15 @@ export async function POST(req: Request) {
                 }
             },
             webpush: {
+                headers: {
+                    Urgency: 'high'
+                },
+                notification: {
+                    title,
+                    body,
+                    icon: '/icono.png',
+                    badge: '/icon-192x192.png'
+                },
                 fcmOptions: {
                     link: url || '/'
                 }
@@ -142,11 +151,14 @@ export async function POST(req: Request) {
 
             // Optional: Delete failed tokens from DB to keep it clean
             if (failedTokens.length > 0) {
-                // Delete in chunks or with a safer filter for JSONB extraction
-                await supabase
+                const inClause = `(${failedTokens.map((token: string) => `"${token}"`).join(',')})`;
+                const { error: deleteError } = await supabase
                     .from('push_devices')
                     .delete()
-                    .in('subscription_token->token', failedTokens);
+                    .filter('subscription_token->>token', 'in', inClause);
+                if (deleteError) {
+                    console.error('Failed to cleanup invalid push tokens:', deleteError);
+                }
             }
         }
 

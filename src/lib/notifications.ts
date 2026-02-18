@@ -42,7 +42,6 @@ export async function sendPushNotification(title: string, body: string, url: str
                 title,
                 body,
                 target_url: url,
-                sent_count: tokens.length,
                 status: 'sent'
             });
 

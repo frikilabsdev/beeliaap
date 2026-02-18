@@ -101,6 +101,8 @@ export function PushSubscription() {
                         localStorage.removeItem("fcm_token");
                         alert("Hubo un error al guardar tu suscripción. Por favor, intenta de nuevo.");
                     }
+                } else {
+                    alert("No se pudo generar el token de notificaciones. Revisa la configuración Firebase/VAPID e intenta de nuevo.");
                 }
             } else {
                 alert("Las notificaciones fueron denegadas.");

@@ -1,6 +1,6 @@
 // Scripts for firebase messaging
-importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/12.9.0/firebase-messaging-compat.js');
 
 // Initialize the Firebase app in the service worker
 firebase.initializeApp({
@@ -14,51 +14,44 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+function showFallbackNotification(title, body, url) {
+  return self.registration.showNotification(title || 'Beelia', {
+    body: body || 'Tienes una nueva actualización',
+    icon: '/icono.png',
+    data: { url: url || '/' }
+  });
+}
+
 // Fallback for native push events (Mandatory for iOS to avoid silent push penalties)
 self.addEventListener('push', (event) => {
-  if (event.data) {
-    try {
-      const payload = event.data.json();
-      console.log('[SW] Push event received: ', payload);
+  try {
+    const payload = event.data ? event.data.json() : {};
+    console.log('[SW] Push event received: ', payload);
 
-      // If payload is from FCM, it might be nested or direct
-      const notification = payload.notification || payload;
-      const data = payload.data || {};
+    const notification = payload.notification || {};
+    const data = payload.data || {};
 
-      const notificationTitle = notification.title || 'Nueva Alerta';
-      const notificationOptions = {
-        body: notification.body || '',
-        icon: '/icono.png',
-        data: {
-          url: data.url || '/'
-        }
-      };
-
-      event.waitUntil(
-        self.registration.showNotification(notificationTitle, notificationOptions)
-      );
-    } catch (e) {
-      console.error('[SW] Error parsing push data:', e);
-      // Even if parse fails, we MUST show something to avoid WebKit penalty
-      event.waitUntil(
-        self.registration.showNotification('Beelia', {
-          body: 'Tienes una nueva actualización',
-          icon: '/icono.png'
-        })
-      );
-    }
+    event.waitUntil(showFallbackNotification(
+      notification.title || 'Nueva Alerta',
+      notification.body || '',
+      data.url || '/'
+    ));
+  } catch (e) {
+    console.error('[SW] Error parsing push data:', e);
+    // Even if parse fails, we MUST show something to avoid WebKit penalty
+    event.waitUntil(showFallbackNotification('Beelia', 'Tienes una nueva actualización', '/'));
   }
 });
 
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-  const notificationTitle = payload.notification.title;
+  const notificationTitle = payload?.notification?.title || 'Nueva Alerta';
   const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/icono.png', // Updated path
+    body: payload?.notification?.body || '',
+    icon: '/icono.png',
     data: {
-      url: payload.data ? payload.data.url : '/'
+      url: payload?.data?.url || '/'
     }
   };
 
