@@ -99,10 +99,12 @@ export function PushSubscription() {
         <>
             <button
                 onClick={handleSubscribe}
-                disabled={loading || isSubscribed}
-                className={`flex-1 flex items-center justify-center space-x-3 px-6 py-5 rounded-2xl border transition-all duration-300 shadow-lg active:scale-95 ${isSubscribed || permission === "denied"
+                disabled={loading}
+                className={`flex-1 flex items-center justify-center space-x-3 px-6 py-5 rounded-2xl border transition-all duration-300 shadow-lg active:scale-95 ${permission === "denied"
                     ? "bg-brand-pearl/20 border-brand-gold/10 text-brand-obsidian/40 cursor-default"
-                    : "bg-white border-brand-gold/20 text-brand-obsidian hover:shadow-xl hover:scale-[1.02]"
+                    : isSubscribed
+                        ? "bg-white border-brand-gold/40 text-brand-obsidian hover:shadow-xl hover:scale-[1.02]"
+                        : "bg-white border-brand-gold/20 text-brand-obsidian hover:shadow-xl hover:scale-[1.02]"
                     }`}
             >
                 {loading ? (
