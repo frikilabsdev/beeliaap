@@ -43,6 +43,9 @@ export function PushSubscription() {
                 // Listen for foreground messages
                 onMessageListener().then((payload: any) => {
                     console.log("Foreground message received:", payload);
+                    if (payload.notification) {
+                        alert(`Notificación: ${payload.notification.title}\n${payload.notification.body}`);
+                    }
                 });
             }
         }
