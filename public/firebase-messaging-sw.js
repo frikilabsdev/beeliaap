@@ -14,11 +14,39 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
-// Fallback for native push events (sometimes more reliable than onBackgroundMessage)
+// Fallback for native push events (Mandatory for iOS to avoid silent push penalties)
 self.addEventListener('push', (event) => {
   if (event.data) {
-    console.log('[SW] Push event received: ', event.data.json());
-    // If it's not handled by FCM onBackgroundMessage, this catches it
+    try {
+      const payload = event.data.json();
+      console.log('[SW] Push event received: ', payload);
+
+      // If payload is from FCM, it might be nested or direct
+      const notification = payload.notification || payload;
+      const data = payload.data || {};
+
+      const notificationTitle = notification.title || 'Nueva Alerta';
+      const notificationOptions = {
+        body: notification.body || '',
+        icon: '/icono.png',
+        data: {
+          url: data.url || '/'
+        }
+      };
+
+      event.waitUntil(
+        self.registration.showNotification(notificationTitle, notificationOptions)
+      );
+    } catch (e) {
+      console.error('[SW] Error parsing push data:', e);
+      // Even if parse fails, we MUST show something to avoid WebKit penalty
+      event.waitUntil(
+        self.registration.showNotification('Beelia', {
+          body: 'Tienes una nueva actualización',
+          icon: '/icono.png'
+        })
+      );
+    }
   }
 });
 

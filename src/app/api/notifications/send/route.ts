@@ -142,10 +142,11 @@ export async function POST(req: Request) {
 
             // Optional: Delete failed tokens from DB to keep it clean
             if (failedTokens.length > 0) {
+                // Delete in chunks or with a safer filter for JSONB extraction
                 await supabase
                     .from('push_devices')
                     .delete()
-                    .filter('subscription_token->>token', 'in', `(${failedTokens.join(',')})`);
+                    .in('subscription_token->token', failedTokens);
             }
         }
 

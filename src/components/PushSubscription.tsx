@@ -87,13 +87,20 @@ export function PushSubscription() {
                     setIsSubscribed(true);
                     localStorage.setItem("fcm_token", fcmToken);
 
-                    await supabase.from("push_devices").upsert([
+                    const { error: upsertError } = await supabase.from("push_devices").upsert([
                         {
                             subscription_token: { token: fcmToken },
                             device_type: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? "mobile" : "desktop",
                             last_used_at: new Date().toISOString()
                         }
                     ], { onConflict: 'subscription_token' });
+
+                    if (upsertError) {
+                        console.error("Error saving token to database:", upsertError);
+                        setIsSubscribed(false);
+                        localStorage.removeItem("fcm_token");
+                        alert("Hubo un error al guardar tu suscripción. Por favor, intenta de nuevo.");
+                    }
                 }
             } else {
                 alert("Las notificaciones fueron denegadas.");
