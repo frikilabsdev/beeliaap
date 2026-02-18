@@ -27,7 +27,20 @@ export const requestForToken = async () => {
             return null;
         }
 
-        const currentToken = await getToken(messaging, { vapidKey });
+        // Explicitly register service worker for better reliability in PWA mode
+        let currentToken = null;
+        if ('serviceWorker' in navigator) {
+            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+            console.log('SW Registered explicitly:', registration.scope);
+            currentToken = await getToken(messaging, {
+                vapidKey,
+                serviceWorkerRegistration: registration
+            });
+        } else {
+            // Fallback for non-SW environments (though required for push)
+            currentToken = await getToken(messaging, { vapidKey });
+        }
+
         if (currentToken) {
             console.log('Token received:', currentToken);
             return currentToken;

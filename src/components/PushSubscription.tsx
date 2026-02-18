@@ -28,6 +28,19 @@ export function PushSubscription() {
             if ("Notification" in window) {
                 setPermission(Notification.permission);
 
+                const checkSW = async () => {
+                    if ('serviceWorker' in navigator) {
+                        try {
+                            const registrations = await navigator.serviceWorker.getRegistrations();
+                            console.log('Active SW registrations:', registrations.length);
+                            registrations.forEach(r => console.log('SW Scope:', r.scope));
+                        } catch (e) {
+                            console.error('Error checking SW:', e);
+                        }
+                    }
+                };
+                checkSW();
+
                 const checkSubscription = async () => {
                     const token = localStorage.getItem("fcm_token");
                     if (token) setIsSubscribed(true);

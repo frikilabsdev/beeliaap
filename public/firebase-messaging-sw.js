@@ -1,6 +1,6 @@
 // Scripts for firebase messaging
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
 
 // Initialize the Firebase app in the service worker
 firebase.initializeApp({
@@ -13,6 +13,14 @@ firebase.initializeApp({
 });
 
 const messaging = firebase.messaging();
+
+// Fallback for native push events (sometimes more reliable than onBackgroundMessage)
+self.addEventListener('push', (event) => {
+  if (event.data) {
+    console.log('[SW] Push event received: ', event.data.json());
+    // If it's not handled by FCM onBackgroundMessage, this catches it
+  }
+});
 
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message ', payload);
