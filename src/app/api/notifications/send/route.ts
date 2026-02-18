@@ -116,9 +116,15 @@ export async function POST(req: Request) {
         };
 
         // 4. Send Message
+        console.log('--- FCM STEP 1: Payload constructed');
         console.log('FCM Payload:', JSON.stringify(message, null, 2));
-        const response = await firebase.messaging().sendEachForMulticast(message);
 
+        console.log('--- FCM STEP 2: Calling sendEachForMulticast...');
+        const startTime = Date.now();
+        const response = await firebase.messaging().sendEachForMulticast(message);
+        const duration = Date.now() - startTime;
+
+        console.log(`--- FCM STEP 3: Response received in ${duration}ms`);
         console.log(`FCM Response Summary: Success=${response.successCount}, Failure=${response.failureCount}`);
 
         // 5. Cleanup failed tokens if needed
@@ -127,7 +133,8 @@ export async function POST(req: Request) {
             response.responses.forEach((resp: any, idx: number) => {
                 if (!resp.success) {
                     failedTokens.push(tokens[idx]);
-                    console.error(`Token Index ${idx} [${tokens[idx].substring(0, 10)}...] failed:`, JSON.stringify(resp.error, null, 2));
+                    console.error(`Token Index ${idx} [${tokens[idx].substring(0, 10)}...] failed with code: ${resp.error?.code}`);
+                    console.error(`Full error:`, JSON.stringify(resp.error, null, 2));
                 } else {
                     console.log(`Token Index ${idx} succeeded: ${resp.messageId}`);
                 }
